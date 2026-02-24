@@ -1,0 +1,111 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id           String    @id @default(uuid())
+    email        String    @unique
+    passwordHash String
+    role         Role      @default(READER)
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
+    sessions     Session[]
+}
+
+enum Role {
+    READER
+    MODERATOR
+    ADMIN
+}
+
+model Session {
+    id           String   @id @default(uuid())
+    userId       String
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    refreshToken String   @unique
+    expiresAt    DateTime
+    createdAt    DateTime @default(now())
+}
+
+model Manga {
+    id            String       @id @default(uuid())
+    slug          String       @unique
+    title         String
+    description   String       @db.Text
+    coverImage    String
+    status        MangaStatus  @default(ONGOING)
+    rating        Float        @default(0)
+    views         Int          @default(0)
+    author        String
+    artist        String
+    publishedYear Int
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+    genres        MangaGenre[]
+    tags          MangaTag[]
+    chapters      Chapter[]
+}
+
+enum MangaStatus {
+    ONGOING
+    COMPLETED
+    HIATUS
+}
+
+model Genre {
+    id    String       @id @default(uuid())
+    name  String       @unique
+    manga MangaGenre[]
+}
+
+model MangaGenre {
+    mangaId String
+    genreId String
+    manga   Manga  @relation(fields: [mangaId], references: [id], onDelete: Cascade)
+    genre   Genre  @relation(fields: [genreId], references: [id])
+
+    @@id([mangaId, genreId])
+}
+
+model Tag {
+    id    String     @id @default(uuid())
+    name  String     @unique
+    manga MangaTag[]
+}
+
+model MangaTag {
+    mangaId String
+    tagId   String
+    manga   Manga  @relation(fields: [mangaId], references: [id], onDelete: Cascade)
+    tag     Tag    @relation(fields: [tagId], references: [id])
+
+    @@id([mangaId, tagId])
+}
+
+model Chapter {
+    id          String   @id @default(uuid())
+    mangaId     String
+    manga       Manga    @relation(fields: [mangaId], references: [id], onDelete: Cascade)
+    number      Int
+    title       String
+    publishedAt DateTime @default(now())
+    views       Int      @default(0)
+    pages       Page[]
+
+    @@unique([mangaId, number])
+}
+
+model Page {
+    id        String  @id @default(uuid())
+    chapterId String
+    chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+    number    Int
+    imageUrl  String
+
+    @@unique([chapterId, number])
+}

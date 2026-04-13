@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/api/v1/docs",
+      "permanent": false
+    }
+  ]
+}

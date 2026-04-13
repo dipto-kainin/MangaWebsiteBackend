@@ -19,8 +19,16 @@ export function configureApp(app: INestApplication): void {
       return res.status(200).send(faviconPng);
     }
 
+    if (req.method === 'GET' && req.path === '/docs') {
+      return res.redirect('/docs/');
+    }
+
+    if (req.method === 'GET' && req.path === '/api/v1/docs') {
+      return res.redirect('/api/v1/docs/');
+    }
+
     if (req.method === 'GET' && req.path === '/') {
-      return res.redirect(isVercel ? '/docs' : '/api/v1/docs');
+      return res.redirect(isVercel ? '/docs/' : '/api/v1/docs/');
     }
 
     next();

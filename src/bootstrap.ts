@@ -6,10 +6,19 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 export function configureApp(app: INestApplication): void {
   const isVercel = process.env.VERCEL === '1';
   const globalPrefix = isVercel ? 'v1' : 'api/v1';
+  const faviconPng = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7Zl6kAAAAASUVORK5CYII=',
+    'base64',
+  );
 
   app.setGlobalPrefix(globalPrefix);
 
   app.use((req: any, res: any, next: () => void) => {
+    if (req.method === 'GET' && (req.path === '/favicon.ico' || req.path === '/favicon.png')) {
+      res.setHeader('Content-Type', 'image/png');
+      return res.status(200).send(faviconPng);
+    }
+
     if (req.method === 'GET' && req.path === '/') {
       return res.redirect(isVercel ? '/api/v1/docs' : '/api/v1/docs');
     }

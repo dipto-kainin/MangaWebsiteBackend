@@ -15,7 +15,18 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
-    this.client = new Redis(redisUrl);
+    this.client = new Redis(redisUrl, {
+      connectTimeout: 5000,
+      maxRetriesPerRequest: 1,
+      enableReadyCheck: false,
+      enableOfflineQueue: false,
+      retryStrategy: () => null,
+    });
+
+    this.client.on('error', (err) => {
+      console.warn('[RedisService] Connection failed, continuing without cache:', err.message);
+      this.client = undefined;
+    });
   }
 
   async onModuleDestroy() {

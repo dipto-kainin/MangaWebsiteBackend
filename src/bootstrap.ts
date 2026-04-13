@@ -5,7 +5,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 export function configureApp(app: INestApplication): void {
   const isVercel = process.env.VERCEL === '1';
-  const globalPrefix = isVercel ? 'v1' : 'api/v1';
+  const globalPrefix = isVercel ? '' : 'api/v1';
   const faviconPng = Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7Zl6kAAAAASUVORK5CYII=',
     'base64',
@@ -20,7 +20,7 @@ export function configureApp(app: INestApplication): void {
     }
 
     if (req.method === 'GET' && req.path === '/') {
-      return res.redirect(isVercel ? '/api/v1/docs' : '/api/v1/docs');
+      return res.redirect(isVercel ? '/docs' : '/api/v1/docs');
     }
 
     next();

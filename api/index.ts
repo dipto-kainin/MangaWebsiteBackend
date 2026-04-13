@@ -6,20 +6,35 @@ import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/bootstrap';
 
 let cachedHandler: ReturnType<typeof serverless> | undefined;
+let initPromise: Promise<ReturnType<typeof serverless>> | undefined;
 
 async function getHandler() {
   if (cachedHandler) {
     return cachedHandler;
   }
 
-  const expressApp = express();
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp));
+  if (initPromise) {
+    return initPromise;
+  }
 
-  configureApp(app);
-  await app.init();
+  initPromise = (async () => {
+    const expressApp = express();
+    const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp));
 
-  cachedHandler = serverless(expressApp);
-  return cachedHandler;
+    configureApp(app);
+
+    await Promise.race([
+      app.init(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('App init timeout')), 15000)),
+    ]).catch((err) => {
+      console.warn('[Serverless] App init failed:', err.message);
+    });
+
+    cachedHandler = serverless(expressApp);
+    return cachedHandler;
+  })();
+
+  return initPromise;
 }
 
 export default async function handler(req: any, res: any) {

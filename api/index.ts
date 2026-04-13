@@ -23,12 +23,7 @@ async function getHandler() {
 
     configureApp(app);
 
-    await Promise.race([
-      app.init(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('App init timeout')), 15000)),
-    ]).catch((err) => {
-      console.warn('[Serverless] App init failed:', err.message);
-    });
+    await app.init();
 
     cachedHandler = serverless(expressApp);
     return cachedHandler;

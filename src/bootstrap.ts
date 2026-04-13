@@ -6,6 +6,14 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 export function configureApp(app: INestApplication): void {
   app.setGlobalPrefix('api/v1');
 
+  app.use((req: any, res: any, next: () => void) => {
+    if (req.method === 'GET' && req.path === '/') {
+      return res.redirect('/api/v1/docs');
+    }
+
+    next();
+  });
+
   app.use(cookieParser());
 
   app.enableCors({

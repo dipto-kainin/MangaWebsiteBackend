@@ -4,11 +4,14 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 export function configureApp(app: INestApplication): void {
-  app.setGlobalPrefix('api/v1');
+  const isVercel = process.env.VERCEL === '1';
+  const globalPrefix = isVercel ? 'v1' : 'api/v1';
+
+  app.setGlobalPrefix(globalPrefix);
 
   app.use((req: any, res: any, next: () => void) => {
     if (req.method === 'GET' && req.path === '/') {
-      return res.redirect('/api/v1/docs');
+      return res.redirect(isVercel ? '/api/v1/docs' : '/api/v1/docs');
     }
 
     next();

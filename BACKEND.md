@@ -1,5 +1,7 @@
 # IronVine — Backend Specification
 
+This is a Backend API specification for the IronVine manga platform. It defines the technology stack, database schema, authentication flow, API endpoints, and integration plan for the frontend.
+
 ## Stack Recommendation
 
 | Layer | Choice | Notes |
@@ -13,7 +15,7 @@
 | File Storage | Cloudinary / AWS S3 | Cover images, chapter pages |
 | Caching | Redis | Chapter page URLs, rate limiting |
 | API Style | REST | Prefix: `/api/v1` |
-
+:
 ---
 
 ## Database Schema
